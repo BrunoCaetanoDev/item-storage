@@ -1,0 +1,9 @@
+[
+  {
+    "name": "item 1",
+    "description": "Description of item 1",
+    "price": 10,
+    "stock": 1,
+    "market": "PT"
+  }
+]
