@@ -60,7 +60,7 @@ public class ItemController {
     )})
     public ResponseEntity<PagedModel<GetItemResponse>> getItems(
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "status", required = false) String market,
+            @RequestParam(name = "market", required = false) String market,
             @RequestParam(name = "status", required = false) String status,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "20") int size,
