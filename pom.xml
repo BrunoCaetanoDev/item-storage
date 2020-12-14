@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.bruno.caetano.dev</groupId>
     <artifactId>item-storage</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <name>item-storage</name>
     <description>A small, decoupled and domain-driven cloud-ready microservice based in SpringBoot that aims to manage a
         product catalogue and storage facility.
