@@ -102,8 +102,8 @@ public class ItemController {
 			@RequestParam(name = "market", required = false) String market,
 			@RequestParam(name = "status", required = false) String status,
 			Pageable pageRequest) {
-		ItemStatus itemStatus = ItemStatus.fromName(status);
 		log.trace(GET_ITEMS_MSG);
+		ItemStatus itemStatus = ItemStatus.fromName(status);
 		Page<Item> itemPage = itemService
 				.findAll(Item.builder().name(name).market(market).status(itemStatus).build(), pageRequest);
 		log.info(GET_ITEMS_COUNT_MSG, itemPage.getNumberOfElements(), itemPage.getTotalElements());
