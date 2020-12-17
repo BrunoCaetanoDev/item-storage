@@ -152,6 +152,22 @@ class ItemControllerTest extends ItemStorageTestConstant {
 	}
 
 	@Test
+	void getItemsWithInvalidStatusQParam() throws Exception {
+
+		String responseContent = FileCopyUtils
+				.copyToString(new FileReader(getItemsWhenInvalidStatusFilter400BadRequest.getFile()));
+		mockMvc
+				.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?status=invalid"))
+						.header(TRACE_ID_HEADER, "getItemsWithInvalidStatusQParam")
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest())
+				.andExpect(header().exists(TRACE_ID_HEADER))
+				.andExpect(header().string(TRACE_ID_HEADER, "getItemsWithInvalidStatusQParam"))
+				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEMS_SERVICE_OPERATION))
+				.andExpect(content().json(responseContent));
+	}
+
+	@Test
 	void getItem() throws Exception {
 		Item persistedItem = Item.builder()
 				.id(ITEM_ONE_ID)
