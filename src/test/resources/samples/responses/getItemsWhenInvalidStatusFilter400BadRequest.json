@@ -1,0 +1,6 @@
+{
+  "traceId": "getItemsWithInvalidStatusQParam",
+  "operation": "GetItems",
+  "code": 400,
+  "message": "Invalid item status invalid. Recognized status ACTIVE, INACTIVE."
+}

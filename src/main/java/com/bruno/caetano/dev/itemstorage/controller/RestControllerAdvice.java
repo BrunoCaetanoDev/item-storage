@@ -15,6 +15,7 @@ import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConsta
 import static java.util.stream.Collectors.joining;
 
 import com.bruno.caetano.dev.itemstorage.entity.response.out.OperationErrorResponse;
+import com.bruno.caetano.dev.itemstorage.error.InvalidResourceStatusException;
 import com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant;
 import java.util.List;
 import java.util.Optional;
@@ -50,12 +51,19 @@ public class RestControllerAdvice implements ResponseBodyAdvice<Object> {
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<OperationErrorResponse> handleBadRequest(MethodArgumentNotValidException e) {
+	public ResponseEntity<OperationErrorResponse> handleBadRequestMethodArgument(MethodArgumentNotValidException e) {
 		List<String> fieldErrors = e.getBindingResult().getFieldErrors().stream()
 				.map(f -> String.join(WHITE_SPACE_DELIMITER, f.getField(), f.getDefaultMessage()))
 				.collect(Collectors.toList());
 		return buildErrorMessageResponseEntity(String.join(SEMI_COLON_DELIMITER.concat(WHITE_SPACE_DELIMITER), fieldErrors),
 				HttpStatus.BAD_REQUEST);
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(InvalidResourceStatusException.class)
+	public ResponseEntity<OperationErrorResponse> handleBadRequestInvalidResourceStatus(
+			InvalidResourceStatusException e) {
+		return buildErrorMessageResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
 	@ResponseStatus(HttpStatus.CONFLICT)

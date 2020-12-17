@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.2] - 2020-12-14
 ### Added
+* GetItems API operation QParam status validation (ISSUE#5)
 ### Changed
 ### Deprecated
 ### Removed

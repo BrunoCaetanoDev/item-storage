@@ -1,14 +1,14 @@
 <configuration>
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %X{trace-id} - %X{operation} - %msg%n</pattern>
     </encoder>
   </appender>
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>logs/item-storage.log</file>
+  <appender class="ch.qos.logback.core.FileAppender" name="FILE">
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %X{trace-id} - %X{operation} - %msg%n</pattern>
     </encoder>
+    <file>logs/item-storage.log</file>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
       <level>INFO</level>
       <onMatch>ACCEPT</onMatch>

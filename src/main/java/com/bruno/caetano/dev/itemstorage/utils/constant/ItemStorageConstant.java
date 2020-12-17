@@ -60,6 +60,7 @@ public class ItemStorageConstant {
 	 * Miscellaneous
 	 */
 	public static final String FRONT_SLASH_DELIMITER = "/";
+	public static final String COLON_WHITE_SPACE_DELIMITER = ", ";
 	public static final String WHITE_SPACE_DELIMITER = " ";
 	public static final String SEMI_COLON_DELIMITER = ";";
 	public static final String ITEM_API_DESCRIPTION = "A public Restful Api that allows to manage the various item resources.";

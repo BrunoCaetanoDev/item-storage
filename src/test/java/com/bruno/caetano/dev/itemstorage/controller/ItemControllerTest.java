@@ -85,6 +85,8 @@ class ItemControllerTest extends ItemStorageTestConstant {
 	private Resource restockItemWhenValidReturn200OkRequest;
 	@Value("classpath:samples/requests/dispatchItemWhenValidReturn200Ok.json")
 	private Resource dispatchItemWhenValidReturn200OkRequest;
+	@Value("classpath:samples/responses/getItemsWhenInvalidStatusFilter400BadRequest.json")
+	private Resource getItemsWhenInvalidStatusFilter400BadRequest;
 
 	private static String Q_PARAM_URI = "?name=%s&market=%s&status=%s&sort=%s";
 
@@ -112,9 +114,8 @@ class ItemControllerTest extends ItemStorageTestConstant {
 		when(itemService.findAll(Item.builder().build(), pageRequest))
 				.thenReturn(new PageImpl<>(Collections.singletonList(persistedItem), pageRequest, 5));
 
-		mockMvc.perform(
-				get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?size=1&sort=id,asc"))
-						.accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?size=1"))
+				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(header().exists(LINK_HEADER))
 				.andExpect(header().exists(TRACE_ID_HEADER))
@@ -147,6 +148,28 @@ class ItemControllerTest extends ItemStorageTestConstant {
 				.andExpect(header().exists(LINK_HEADER))
 				.andExpect(header().exists(TRACE_ID_HEADER))
 				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEMS_SERVICE_OPERATION))
+				.andExpect(content().json(responseContent));
+	}
+
+	@Test
+	void getItem() throws Exception {
+		Item persistedItem = Item.builder()
+				.id(ITEM_ONE_ID)
+				.name(ITEM_ONE_NAME)
+				.description(ITEM_ONE_DESCRIPTION)
+				.market(ITEM_ONE_MARKET)
+				.price(BigDecimal.TEN)
+				.stock(BigInteger.ONE).build();
+
+		String responseContent = FileCopyUtils.copyToString(new FileReader(getItemWhenExistsReturn200Ok.getFile()));
+
+		when(itemService.findBydId(ITEM_ONE_ID)).thenReturn(persistedItem);
+
+		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS, ITEM_ONE_ID)))
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(header().exists(TRACE_ID_HEADER))
+				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEM_SERVICE_OPERATION))
 				.andExpect(content().json(responseContent));
 	}
 
@@ -215,29 +238,6 @@ class ItemControllerTest extends ItemStorageTestConstant {
 				.andExpect(header().string(SERVICE_OPERATION_HEADER, UPDATE_ITEM_SERVICE_OPERATION))
 				.andExpect(content().json(responseContent));
 	}
-
-	@Test
-	void getItem() throws Exception {
-		Item persistedItem = Item.builder()
-				.id(ITEM_ONE_ID)
-				.name(ITEM_ONE_NAME)
-				.description(ITEM_ONE_DESCRIPTION)
-				.market(ITEM_ONE_MARKET)
-				.price(BigDecimal.TEN)
-				.stock(BigInteger.ONE).build();
-
-		String responseContent = FileCopyUtils.copyToString(new FileReader(getItemWhenExistsReturn200Ok.getFile()));
-
-		when(itemService.findBydId(ITEM_ONE_ID)).thenReturn(persistedItem);
-
-		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS, ITEM_ONE_ID)))
-				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(header().exists(TRACE_ID_HEADER))
-				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEM_SERVICE_OPERATION))
-				.andExpect(content().json(responseContent));
-	}
-
 
 	@Test
 	void deleteItem() throws Exception {
