@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ItemStorageProperties {
 
-    @Value("${server.servlet.context-path:#{null}}")
-    private String servletContextPath;
-
-    @Value("${spring.application.name:item-storage}")
-    public String applicationName;
+	@Value("${spring.application.name:item-storage}")
+	public String applicationName;
+	@Value("${server.servlet.context-path:#{null}}")
+	private String servletContextPath;
 }

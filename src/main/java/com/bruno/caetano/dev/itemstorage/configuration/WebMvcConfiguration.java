@@ -10,15 +10,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfiguration {
 
-    @Bean
-    public WebMvcConfigurer initializerWebMvcConfigurer(MdcInitInterceptor mdcInitHandler, HttpLoggerInterceptor loggingHandler) {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addInterceptors(InterceptorRegistry registry) {
-                registry.addInterceptor(mdcInitHandler);
-                registry.addInterceptor(loggingHandler);
-            }
-        };
-    }
+	@Bean
+	public WebMvcConfigurer initializerWebMvcConfigurer(MdcInitInterceptor mdcInitHandler,
+			HttpLoggerInterceptor loggingHandler) {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addInterceptors(InterceptorRegistry registry) {
+				registry.addInterceptor(mdcInitHandler);
+				registry.addInterceptor(loggingHandler);
+			}
+		};
+	}
 
 }

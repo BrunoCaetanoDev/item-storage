@@ -8,8 +8,8 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @SpringBootApplication
 public class ItemStorageApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ItemStorageApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(ItemStorageApplication.class, args);
+	}
 
 }
