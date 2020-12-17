@@ -114,7 +114,7 @@ class ItemControllerTest extends ItemStorageTestConstant {
 		when(itemService.findAll(Item.builder().build(), pageRequest))
 				.thenReturn(new PageImpl<>(Collections.singletonList(persistedItem), pageRequest, 5));
 
-		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?size=1"))
+		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?size=1&sort=id,asc"))
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(header().exists(LINK_HEADER))
