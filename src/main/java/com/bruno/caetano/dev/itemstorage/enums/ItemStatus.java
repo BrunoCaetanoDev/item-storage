@@ -5,11 +5,11 @@ import java.util.Optional;
 
 public enum ItemStatus {
 
-    ACTIVE, INACTIVE;
+	ACTIVE, INACTIVE;
 
-    public static ItemStatus fromName(String name) {
-        Optional<ItemStatus> itemStatus = Arrays.stream(values()).filter(e -> e.name().equals(name)).findFirst();
-        return itemStatus.orElse(null);
-    }
+	public static ItemStatus fromName(String name) {
+		Optional<ItemStatus> itemStatus = Arrays.stream(values()).filter(e -> e.name().equals(name)).findFirst();
+		return itemStatus.orElse(null);
+	}
 
 }

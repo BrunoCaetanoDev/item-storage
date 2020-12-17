@@ -29,8 +29,6 @@ import static org.springframework.hateoas.IanaLinkRelations.FIRST;
 import static org.springframework.hateoas.IanaLinkRelations.LAST;
 import static org.springframework.hateoas.IanaLinkRelations.NEXT;
 import static org.springframework.hateoas.IanaLinkRelations.PREVIOUS;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.bruno.caetano.dev.itemstorage.entity.model.Item;
 import com.bruno.caetano.dev.itemstorage.entity.request.in.CreateItemRequest;
@@ -101,7 +99,7 @@ public class ItemController {
 	)})
 	public ResponseEntity<PagedModel<GetItemResponse>> getItems(
 			@RequestParam(name = "name", required = false) String name,
-			@RequestParam(name = "status", required = false) String market,
+			@RequestParam(name = "market", required = false) String market,
 			@RequestParam(name = "status", required = false) String status,
 			Pageable pageRequest) {
 		ItemStatus itemStatus = ItemStatus.fromName(status);
@@ -176,10 +174,11 @@ public class ItemController {
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-		UriComponentsBuilder baseUri = ServletUriComponentsBuilder.fromServletMapping(request).path(request.getRequestURI());
+		UriComponentsBuilder baseUri = ServletUriComponentsBuilder.fromServletMapping(request)
+				.path(request.getRequestURI());
 
-		for(Entry<String, String []> entry : request.getParameterMap().entrySet()){
-			for(String value : entry.getValue()){
+		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+			for (String value : entry.getValue()) {
 				baseUri.queryParam(entry.getKey(), value);
 			}
 		}
@@ -202,17 +201,19 @@ public class ItemController {
 			getItemResponsePagedModel.add(Link.of(previousBuilder.toUriString()).withRel(PREVIOUS));
 		}
 		if (!itemPage.isFirst()) {
-			UriComponentsBuilder firstBuilder = replacePageParams(original, PageRequest.of(0, pageRequest.getPageSize(), pageRequest.getSort()));
+			UriComponentsBuilder firstBuilder = replacePageParams(original,
+					PageRequest.of(0, pageRequest.getPageSize(), pageRequest.getSort()));
 			getItemResponsePagedModel.add(Link.of(firstBuilder.toUriString()).withRel(FIRST));
 		}
 		if (!itemPage.isLast()) {
-			UriComponentsBuilder firstBuilder = replacePageParams(original, PageRequest.of(itemPage.getTotalPages() - 1, pageRequest.getPageSize(), pageRequest.getSort()));
+			UriComponentsBuilder firstBuilder = replacePageParams(original,
+					PageRequest.of(itemPage.getTotalPages() - 1, pageRequest.getPageSize(), pageRequest.getSort()));
 			getItemResponsePagedModel.add(Link.of(firstBuilder.toUriString()).withRel(LAST));
 		}
 		return getItemResponsePagedModel;
 	}
 
-	private UriComponentsBuilder replacePageParams(UriComponentsBuilder original, Pageable page){
+	private UriComponentsBuilder replacePageParams(UriComponentsBuilder original, Pageable page) {
 		UriComponentsBuilder builder = original.cloneBuilder();
 		builder.replaceQueryParam("page", page.getPageNumber());
 		builder.replaceQueryParam("size", page.getPageSize());

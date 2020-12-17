@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bruno.caetano.dev.itemstorage.entity.model.Item;
+import com.bruno.caetano.dev.itemstorage.enums.ItemStatus;
 import com.bruno.caetano.dev.itemstorage.service.ItemService;
 import com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageTestConstant;
 import com.bruno.caetano.dev.itemstorage.utils.interceptor.HttpLoggerInterceptor;
@@ -85,6 +86,7 @@ class ItemControllerTest extends ItemStorageTestConstant {
 	@Value("classpath:samples/requests/dispatchItemWhenValidReturn200Ok.json")
 	private Resource dispatchItemWhenValidReturn200OkRequest;
 
+	private static String Q_PARAM_URI = "?name=%s&market=%s&status=%s&sort=%s";
 
 	@BeforeEach
 	public void setUp() {
@@ -121,7 +123,7 @@ class ItemControllerTest extends ItemStorageTestConstant {
 	}
 
 	@Test
-	void getItem() throws Exception {
+	void getItemsWithQueryParams() throws Exception {
 		Item persistedItem = Item.builder()
 				.id(ITEM_ONE_ID)
 				.name(ITEM_ONE_NAME)
@@ -130,15 +132,21 @@ class ItemControllerTest extends ItemStorageTestConstant {
 				.price(BigDecimal.TEN)
 				.stock(BigInteger.ONE).build();
 
-		String responseContent = FileCopyUtils.copyToString(new FileReader(getItemWhenExistsReturn200Ok.getFile()));
+		String responseContent = FileCopyUtils.copyToString(new FileReader(getItemsWhenExistsReturn200Ok.getFile()));
+		PageRequest pageRequest = PageRequest
+				.of(0, 20, Sort.by(Sort.Direction.fromString(Sort.Direction.ASC.name()), "name"));
+		when(itemService
+				.findAll(Item.builder().name(ITEM_ONE_NAME).market(ITEM_ONE_MARKET).status(ItemStatus.ACTIVE).build(),
+						pageRequest))
+				.thenReturn(new PageImpl<>(Collections.singletonList(persistedItem), pageRequest, 5));
 
-		when(itemService.findBydId(ITEM_ONE_ID)).thenReturn(persistedItem);
-
-		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS, ITEM_ONE_ID)))
+		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS))
+				.concat(String.format(Q_PARAM_URI, ITEM_ONE_NAME, ITEM_ONE_MARKET, ItemStatus.ACTIVE.name(), "name")))
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
+				.andExpect(header().exists(LINK_HEADER))
 				.andExpect(header().exists(TRACE_ID_HEADER))
-				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEM_SERVICE_OPERATION))
+				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEMS_SERVICE_OPERATION))
 				.andExpect(content().json(responseContent));
 	}
 
@@ -207,6 +215,29 @@ class ItemControllerTest extends ItemStorageTestConstant {
 				.andExpect(header().string(SERVICE_OPERATION_HEADER, UPDATE_ITEM_SERVICE_OPERATION))
 				.andExpect(content().json(responseContent));
 	}
+
+	@Test
+	void getItem() throws Exception {
+		Item persistedItem = Item.builder()
+				.id(ITEM_ONE_ID)
+				.name(ITEM_ONE_NAME)
+				.description(ITEM_ONE_DESCRIPTION)
+				.market(ITEM_ONE_MARKET)
+				.price(BigDecimal.TEN)
+				.stock(BigInteger.ONE).build();
+
+		String responseContent = FileCopyUtils.copyToString(new FileReader(getItemWhenExistsReturn200Ok.getFile()));
+
+		when(itemService.findBydId(ITEM_ONE_ID)).thenReturn(persistedItem);
+
+		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS, ITEM_ONE_ID)))
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(header().exists(TRACE_ID_HEADER))
+				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEM_SERVICE_OPERATION))
+				.andExpect(content().json(responseContent));
+	}
+
 
 	@Test
 	void deleteItem() throws Exception {
