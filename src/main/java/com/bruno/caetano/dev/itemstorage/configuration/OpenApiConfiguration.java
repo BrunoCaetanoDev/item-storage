@@ -11,22 +11,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfiguration {
 
-    @Bean
-    public OpenAPI customOpenAPI(@Value("${application-name}") String appName,
-                                 @Value("${application-description}") String appDescription,
-                                 @Value("${application-version}") String appVersion) {
+	@Bean
+	public OpenAPI customOpenAPI(@Value("${application-name}") String appName,
+			@Value("${application-description}") String appDescription,
+			@Value("${application-version}") String appVersion) {
 
-        return new OpenAPI()
-                .info(new Info()
-                        .title(appName.toUpperCase())
-                        .version(appVersion)
-                        .description(appDescription)
-                        .contact(new Contact()
-                                .name("Bruno Caetano")
-                                .url("http://bruno-caetano-devfolio.herokuapp.com/")
-                                .email("brunoaccdev@gmail.com"))
-                        .termsOfService("http://swagger.io/terms/")
-                        .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")));
-    }
+		return new OpenAPI()
+				.info(new Info()
+						.title(appName.toUpperCase())
+						.version(appVersion)
+						.description(appDescription)
+						.contact(new Contact()
+								.name("Bruno Caetano")
+								.url("http://bruno-caetano-devfolio.herokuapp.com/")
+								.email("brunoaccdev@gmail.com"))
+						.termsOfService("http://swagger.io/terms/")
+						.license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")));
+	}
 
 }
