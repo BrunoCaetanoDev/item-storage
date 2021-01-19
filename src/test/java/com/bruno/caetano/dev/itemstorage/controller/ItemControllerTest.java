@@ -44,6 +44,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -55,7 +56,6 @@ import org.springframework.util.FileCopyUtils;
 @ExtendWith(SpringExtension.class)
 class ItemControllerTest extends ItemStorageTestConstant {
 
-	private static String Q_PARAM_URI = "?name=%s&market=%s&status=%s&sortBy=%s";
 	@Autowired
 	private ItemController itemController;
 	@Autowired
@@ -88,11 +88,14 @@ class ItemControllerTest extends ItemStorageTestConstant {
 	@Value("classpath:samples/responses/getItemsWhenInvalidStatusFilter400BadRequest.json")
 	private Resource getItemsWhenInvalidStatusFilter400BadRequest;
 
+	private static String Q_PARAM_URI = "?name=%s&market=%s&status=%s&sort=%s";
+
 	@BeforeEach
 	public void setUp() {
 		mockMvc = MockMvcBuilders.standaloneSetup(itemController)
 				.setControllerAdvice(restControllerAdvice)
 				.addInterceptors(mdcInitInterceptor, httpLoggerInterceptor)
+				.setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
 				.build();
 	}
 
@@ -111,7 +114,7 @@ class ItemControllerTest extends ItemStorageTestConstant {
 		when(itemService.findAll(Item.builder().build(), pageRequest))
 				.thenReturn(new PageImpl<>(Collections.singletonList(persistedItem), pageRequest, 5));
 
-		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?size=1"))
+		mockMvc.perform(get(FRONT_SLASH_DELIMITER.concat(String.join(FRONT_SLASH_DELIMITER, ITEMS)).concat("?size=1&sort=id,asc"))
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(header().exists(LINK_HEADER))
@@ -163,7 +166,6 @@ class ItemControllerTest extends ItemStorageTestConstant {
 				.andExpect(header().string(SERVICE_OPERATION_HEADER, GET_ITEMS_SERVICE_OPERATION))
 				.andExpect(content().json(responseContent));
 	}
-
 
 	@Test
 	void getItem() throws Exception {

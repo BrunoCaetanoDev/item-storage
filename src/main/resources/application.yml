@@ -21,6 +21,14 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  data:
+    web:
+      pageable:
+        size-parameter: size
+        page-parameter: page
+        default-page-size: 20
+        one-indexed-parameters: false
+        max-page-size: 100
 
 springdoc:
   api-docs:

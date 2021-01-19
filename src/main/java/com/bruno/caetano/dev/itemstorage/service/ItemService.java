@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -26,7 +26,7 @@ public class ItemService implements ItemServiceContract {
 	private final ItemRepository itemRepository;
 
 	@Override
-	public Page<Item> findAll(Item item, PageRequest pageRequest) {
+	public Page<Item> findAll(Item item, Pageable pageRequest) {
 		ExampleMatcher exampleMatcher = ExampleMatcher.matching()
 				.withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
 				.withMatcher("market", ExampleMatcher.GenericPropertyMatchers.exact())

@@ -29,8 +29,6 @@ import static org.springframework.hateoas.IanaLinkRelations.FIRST;
 import static org.springframework.hateoas.IanaLinkRelations.LAST;
 import static org.springframework.hateoas.IanaLinkRelations.NEXT;
 import static org.springframework.hateoas.IanaLinkRelations.PREVIOUS;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.bruno.caetano.dev.itemstorage.entity.model.Item;
 import com.bruno.caetano.dev.itemstorage.entity.request.in.CreateItemRequest;
@@ -52,14 +50,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -74,6 +75,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @RestController
@@ -96,16 +101,13 @@ public class ItemController {
 			@RequestParam(name = "name", required = false) String name,
 			@RequestParam(name = "market", required = false) String market,
 			@RequestParam(name = "status", required = false) String status,
-			@RequestParam(name = "page", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "20") int size,
-			@RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
-			@RequestParam(name = "direction", defaultValue = "ASC") String direction) {
+			Pageable pageRequest) {
 		log.trace(GET_ITEMS_MSG);
 		ItemStatus itemStatus = ItemStatus.fromName(status);
-		Page<Item> itemPage = itemService.findAll(Item.builder().name(name).market(market).status(itemStatus).build(),
-				PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sortBy)));
+		Page<Item> itemPage = itemService
+				.findAll(Item.builder().name(name).market(market).status(itemStatus).build(), pageRequest);
 		log.info(GET_ITEMS_COUNT_MSG, itemPage.getNumberOfElements(), itemPage.getTotalElements());
-		return ResponseEntity.ok().body(buildPagedModel(itemPage, name, market, status, sortBy, direction));
+		return ResponseEntity.ok().body(buildPagedModel(itemPage, name, market, status, pageRequest));
 	}
 
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -168,43 +170,53 @@ public class ItemController {
 	}
 
 	private PagedModel<GetItemResponse> buildPagedModel(Page<Item> itemPage, String name, String market, String status,
-			String sortBy, String direction) {
+			Pageable pageRequest) {
+
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+		UriComponentsBuilder baseUri = ServletUriComponentsBuilder.fromServletMapping(request)
+				.path(request.getRequestURI());
+
+		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+			for (String value : entry.getValue()) {
+				baseUri.queryParam(entry.getKey(), value);
+			}
+		}
+
+		UriComponentsBuilder original = baseUri;
+
 		List<GetItemResponse> getItemResponseList = itemPage.getContent().stream()
 				.map(i -> modelMapper.map(i, GetItemResponse.class)).collect(Collectors.toList());
 		PagedModel<GetItemResponse> getItemResponsePagedModel = PagedModel.of(getItemResponseList,
 				new PagedModel.PageMetadata(itemPage.getSize(), itemPage.getNumber(), itemPage.getTotalElements(),
 						itemPage.getTotalPages()));
-		getItemResponsePagedModel.add(linkTo(methodOn(ItemController.class)
-				.getItems(name, market, status, itemPage.getNumber(), itemPage.getSize(), sortBy, direction)).withSelfRel()
-				.expand());
+		UriComponentsBuilder selfBuilder = replacePageParams(original, itemPage.getPageable());
+		getItemResponsePagedModel.add(Link.of(selfBuilder.toUriString()).withSelfRel());
 		if (itemPage.hasNext()) {
-			getItemResponsePagedModel.add(linkTo(methodOn(ItemController.class)
-					.getItems(name, market, status, itemPage.nextPageable().getPageNumber(),
-							itemPage.nextPageable().getPageSize(), sortBy, direction))
-					.withRel(NEXT)
-					.expand());
+			UriComponentsBuilder nextBuilder = replacePageParams(original, itemPage.nextPageable());
+			getItemResponsePagedModel.add(Link.of(nextBuilder.toUriString()).withRel(NEXT));
 		}
 		if (itemPage.hasPrevious()) {
-			getItemResponsePagedModel.add(linkTo(methodOn(ItemController.class)
-					.getItems(name, market, status, itemPage.previousPageable().getPageNumber(),
-							itemPage.previousPageable().getPageSize(), sortBy, direction))
-					.withRel(PREVIOUS)
-					.expand());
+			UriComponentsBuilder previousBuilder = replacePageParams(original, itemPage.previousPageable());
+			getItemResponsePagedModel.add(Link.of(previousBuilder.toUriString()).withRel(PREVIOUS));
 		}
 		if (!itemPage.isFirst()) {
-			getItemResponsePagedModel.add(linkTo(methodOn(ItemController.class)
-					.getItems(name, market, status, 0, itemPage.getSize(), sortBy, direction))
-					.withRel(FIRST)
-					.expand());
+			UriComponentsBuilder firstBuilder = replacePageParams(original,
+					PageRequest.of(0, pageRequest.getPageSize(), pageRequest.getSort()));
+			getItemResponsePagedModel.add(Link.of(firstBuilder.toUriString()).withRel(FIRST));
 		}
 		if (!itemPage.isLast()) {
-			getItemResponsePagedModel.add(linkTo(methodOn(ItemController.class)
-					.getItems(name, market, status, itemPage.getTotalPages() - 1, itemPage.getSize(), sortBy, direction))
-					.withRel(LAST)
-					.expand());
+			UriComponentsBuilder firstBuilder = replacePageParams(original,
+					PageRequest.of(itemPage.getTotalPages() - 1, pageRequest.getPageSize(), pageRequest.getSort()));
+			getItemResponsePagedModel.add(Link.of(firstBuilder.toUriString()).withRel(LAST));
 		}
 		return getItemResponsePagedModel;
 	}
 
-
+	private UriComponentsBuilder replacePageParams(UriComponentsBuilder original, Pageable page) {
+		UriComponentsBuilder builder = original.cloneBuilder();
+		builder.replaceQueryParam("page", page.getPageNumber());
+		builder.replaceQueryParam("size", page.getPageSize());
+		return builder;
+	}
 }
