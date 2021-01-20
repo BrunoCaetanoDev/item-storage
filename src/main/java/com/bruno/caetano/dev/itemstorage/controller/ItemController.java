@@ -1,35 +1,5 @@
 package com.bruno.caetano.dev.itemstorage.controller;
 
-import static com.bruno.caetano.dev.itemstorage.utils.HttpUtils.buildHttpResponseHeaders;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.CREATE_ITEM_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.CREATE_ITEM_RESULT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.CREATE_ITEM_SERVICE_OPERATION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.DELETE_ITEM_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.DELETE_ITEM_RESULT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.DELETE_ITEM_SERVICE_OPERATION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.DISPATCH_ITEM_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.DISPATCH_ITEM_RESULT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.DISPATCH_ITEM_SERVICE_OPERATION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.FRONT_SLASH_DELIMITER;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.GET_ITEMS_COUNT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.GET_ITEMS_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.GET_ITEMS_SERVICE_OPERATION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.GET_ITEM_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.GET_ITEM_RESULT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.GET_ITEM_SERVICE_OPERATION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.ITEMS;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.ITEM_API_DESCRIPTION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.RESTOCK_ITEM_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.RESTOCK_ITEM_RESULT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.RESTOCK_ITEM_SERVICE_OPERATION;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.UPDATE_ITEM_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.UPDATE_ITEM_RESULT_MSG;
-import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.UPDATE_ITEM_SERVICE_OPERATION;
-import static org.springframework.hateoas.IanaLinkRelations.FIRST;
-import static org.springframework.hateoas.IanaLinkRelations.LAST;
-import static org.springframework.hateoas.IanaLinkRelations.NEXT;
-import static org.springframework.hateoas.IanaLinkRelations.PREVIOUS;
-
 import com.bruno.caetano.dev.itemstorage.entity.model.Item;
 import com.bruno.caetano.dev.itemstorage.entity.request.in.CreateItemRequest;
 import com.bruno.caetano.dev.itemstorage.entity.request.in.DispatchItemRequest;
@@ -48,12 +18,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URI;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -65,20 +29,22 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import static com.bruno.caetano.dev.itemstorage.utils.HttpUtils.buildHttpResponseHeaders;
+import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConstant.*;
+import static org.springframework.hateoas.IanaLinkRelations.*;
 
 @Slf4j
 @RestController
@@ -107,7 +73,7 @@ public class ItemController {
 		Page<Item> itemPage = itemService
 				.findAll(Item.builder().name(name).market(market).status(itemStatus).build(), pageRequest);
 		log.info(GET_ITEMS_COUNT_MSG, itemPage.getNumberOfElements(), itemPage.getTotalElements());
-		return ResponseEntity.ok().body(buildPagedModel(itemPage, name, market, status, pageRequest));
+		return ResponseEntity.ok().body(buildPagedModel(itemPage, pageRequest));
 	}
 
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -169,8 +135,7 @@ public class ItemController {
 		return ResponseEntity.ok(buildHttpResponseHeaders());
 	}
 
-	private PagedModel<GetItemResponse> buildPagedModel(Page<Item> itemPage, String name, String market, String status,
-			Pageable pageRequest) {
+	private PagedModel<GetItemResponse> buildPagedModel(Page<Item> itemPage, Pageable pageRequest) {
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
