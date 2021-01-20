@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import org.springdoc.core.SpringDocUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,8 @@ public class OpenApiConfiguration {
 	public OpenAPI customOpenAPI(@Value("${application-name}") String appName,
 			@Value("${application-description}") String appDescription,
 			@Value("${application-version}") String appVersion) {
-
+		SpringDocUtils.getConfig().replaceWithClass(org.springframework.data.domain.Pageable.class,
+				org.springdoc.core.converters.models.Pageable.class);
 		return new OpenAPI()
 				.info(new Info()
 						.title(appName.toUpperCase())

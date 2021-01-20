@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2020-01-20
+### Added
+### Changed
+* Dependency spring-boot-starter-parent version to 2.4.2 (ISSUE#10)
+### Deprecated
+### Removed
+### Fixed
+* OpenApi Pageable incompatibility (ISSUE#9)
+### Security
+
 ## [0.0.2] - 2020-12-14
 ### Added
 * GetItems API operation QParam status validation (ISSUE#5)
