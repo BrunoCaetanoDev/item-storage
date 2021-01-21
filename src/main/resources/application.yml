@@ -4,12 +4,6 @@ application-version: @project.version@
 
 server:
   port: 8080
-  servlet:
-    context-path: /item-storage/api/v${item.api.version}
-
-item:
-  api:
-    version: 1
 
 spring:
   application:
@@ -17,8 +11,11 @@ spring:
   boot:
     admin:
       client:
-        enabled: true
-        url: http://localhost:9090
+        enabled: ${SPRING_BOOT_ADMIN_CLIENT_ENABLED:true}
+        url: http://localhost:8765
+  cloud:
+    discovery:
+      enabled: ${SPRING_CLOUD_DISCOVERY_ENABLED:true}
   datasource:
     url: "jdbc:h2:mem:testdb"
   h2:
