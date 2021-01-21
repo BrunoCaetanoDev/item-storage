@@ -7,6 +7,10 @@ server:
   servlet:
     context-path: /item-storage/api/v${item.api.version}
 
+item:
+  api:
+    version: 1
+
 spring:
   application:
     name: item-storage
@@ -45,10 +49,6 @@ springdoc:
     path: "/api-docs"
   swagger-ui:
     path: "/"
-
-item:
-  api:
-    version: 1
 
 management:
   endpoints:

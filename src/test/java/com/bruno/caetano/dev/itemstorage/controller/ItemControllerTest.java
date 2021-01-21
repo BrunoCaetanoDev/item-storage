@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bruno.caetano.dev.itemstorage.entity.model.Item;
 import com.bruno.caetano.dev.itemstorage.enums.ItemStatus;
 import com.bruno.caetano.dev.itemstorage.service.ItemService;
+import com.bruno.caetano.dev.itemstorage.utils.annotation.SpringIntegrationTest;
 import com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageTestConstant;
 import com.bruno.caetano.dev.itemstorage.utils.interceptor.HttpLoggerInterceptor;
 import com.bruno.caetano.dev.itemstorage.utils.interceptor.MdcInitInterceptor;
@@ -53,8 +54,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.FileCopyUtils;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringIntegrationTest
 @ExtendWith(SpringExtension.class)
 class ItemControllerTest extends ItemStorageTestConstant {
 
