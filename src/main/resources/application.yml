@@ -4,8 +4,6 @@ application-version: @project.version@
 
 server:
   port: 8080
-  servlet:
-    context-path: /item-storage/api/v${item.api.version}
 
 spring:
   application:
@@ -13,8 +11,11 @@ spring:
   boot:
     admin:
       client:
-        enabled: true
-        url: http://localhost:9090
+        enabled: ${SPRING_BOOT_ADMIN_CLIENT_ENABLED:true}
+        url: http://localhost:8765
+  cloud:
+    discovery:
+      enabled: ${SPRING_CLOUD_DISCOVERY_ENABLED:true}
   datasource:
     url: "jdbc:h2:mem:testdb"
   h2:
@@ -30,15 +31,21 @@ spring:
         one-indexed-parameters: false
         max-page-size: 100
 
+eureka:
+  client:
+    registryFetchIntervalSeconds: 5
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: item-storage
+
 springdoc:
   api-docs:
     path: "/api-docs"
   swagger-ui:
     path: "/"
-
-item:
-  api:
-    version: 1
 
 management:
   endpoints:

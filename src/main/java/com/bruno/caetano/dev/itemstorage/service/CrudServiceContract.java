@@ -5,14 +5,14 @@ import org.springframework.data.domain.Pageable;
 
 public interface CrudServiceContract<T extends Object> {
 
-	Page<T> findAll(T entity, Pageable pageRequest);
+    Page<T> findAll(T entity, Pageable pageRequest);
 
-	T findBydId(String id);
+    T findBydId(String id);
 
-	T save(T item);
+    T save(T item);
 
-	T update(T item);
+    T update(T item);
 
-	void deleteById(String id);
+    void deleteById(String id);
 
 }

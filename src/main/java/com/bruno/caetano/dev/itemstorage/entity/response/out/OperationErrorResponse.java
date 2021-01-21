@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OperationErrorResponse {
 
-	private String traceId;
-	private String operation;
-	private int code;
-	private String message;
+    private String traceId;
+    private String operation;
+    private int code;
+    private String message;
 
 }
