@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +48,7 @@ import static com.bruno.caetano.dev.itemstorage.utils.constant.ItemStorageConsta
 import static org.springframework.hateoas.IanaLinkRelations.*;
 
 @Slf4j
+@RefreshScope
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(ITEMS)

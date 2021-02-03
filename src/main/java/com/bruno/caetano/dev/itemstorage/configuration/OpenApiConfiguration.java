@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Profile;
 public class OpenApiConfiguration {
 
     @Bean
-    public OpenAPI customOpenAPI(@Value("${application-name}") String appName,
-                                 @Value("${application-description}") String appDescription,
-                                 @Value("${application-version}") String appVersion) {
+    public OpenAPI customOpenAPI(@Value("${application.name}") String appName,
+                                 @Value("${application.description}") String appDescription,
+                                 @Value("${application.version}") String appVersion) {
         SpringDocUtils.getConfig().replaceWithClass(org.springframework.data.domain.Pageable.class,
                 org.springdoc.core.converters.models.Pageable.class);
         return new OpenAPI()

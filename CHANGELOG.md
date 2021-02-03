@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2020-01-21
 ### Added
 * Eureka Client and service registration capabilities (ECIS-15)
+* Spring Cloud configuration client (ECIS-16)
 ### Changed
 ### Deprecated
 ### Removed
