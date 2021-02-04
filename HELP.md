@@ -19,7 +19,7 @@ For further reference, please consider the following sections:
 * [Lombok](https://projectlombok.org)
 * [ModelMapper](http://modelmapper.org)
 * [SpringDoc OpenAPI](https://springdoc.org)
-
+* [Cloud Bootstrap](https://spring.io/projects/spring-cloud-commons)
 
 ### Guides
 The following guides illustrate how to use some features concretely:
@@ -27,6 +27,7 @@ The following guides illustrate how to use some features concretely:
 * [Building a Hypermedia-Driven RESTful Web Service](https://spring.io/guides/gs/rest-hateoas/)
 * [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
 * [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
+* [Centralized Configuration](https://spring.io/guides/gs/centralized-configuration/)
 * [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 

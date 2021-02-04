@@ -1,0 +1,14 @@
+server:
+    port: ${SERVER_PORT:8080}
+spring:
+  application:
+    name: item-storage
+  cloud:
+    config:
+      uri: http://configuration-server:8888
+      failFast: true
+      retry:
+        initialInterval: 3000
+        multiplier: 1.3
+        maxInterval: 5000
+        maxAttempts: 20
