@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Spring Cloud configuration client (ECIS-16)
 * Spring Sleuth client (ECIS-20)
 * Spring Zipkin client (ECIS-22)
+
 ### Changed
 ### Deprecated
 ### Removed
